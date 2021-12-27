@@ -1,29 +1,5 @@
 import 'package:flutter/material.dart';
 
-// class HomePage extends StatelessWidget {
-//   const HomePage({Key? key}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//         appBar: AppBar(
-//           backgroundColor: Color.fromRGBO(0, 0, 0, 0),
-//           title: Padding(
-//           padding: EdgeInsets.fromLTRB(24, 30, 24, 20),
-//           child: Row(
-//             mainAxisAlignment: MainAxisAlignment.start,
-//             children: [
-//               Text('Prime ', style: TextStyle(color: Color.fromRGBO(0, 185, 231, 1))),
-//               Text('Video', style: TextStyle(color: Colors.white))
-//             ],
-//           ),
-//         )),
-//         body: MainContent(),
-//         backgroundColor: Colors.black
-//       );
-//   }
-// }
-
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -37,9 +13,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color.fromRGBO(0, 0, 0, 0),
+          backgroundColor: const Color.fromRGBO(0, 0, 0, 0),
           title: Padding(
-          padding: EdgeInsets.fromLTRB(24, 30, 24, 20),
+          padding: const EdgeInsets.fromLTRB(24, 30, 24, 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: const [
@@ -75,7 +51,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 class MainContent extends StatefulWidget {
-  MainContent({Key? key}) : super(key: key);
+  const MainContent({Key? key}) : super(key: key);
 
   @override
   _MainContentState createState() => _MainContentState();
@@ -91,12 +67,15 @@ class _MainContentState extends State<MainContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
+        // 横向分类bar
         CatogeryList(),
+        // 轮播图
         ImageList(list: imageList),
-        Padding(
+        const Padding(
           padding: EdgeInsets.fromLTRB(24, 0, 24, 0),
           child: Text("最新发布", style: TextStyle(fontSize: 19, color: Color.fromRGBO(0, 185, 231, 1)), textAlign: TextAlign.left),
         ),
+        // 推荐影片列表
         Expanded(child: VideoList(list: videoList))
       ]
     );
@@ -199,8 +178,8 @@ class ImageList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 172,
-      margin: EdgeInsets.fromLTRB(0, 40, 0, 24),
-      padding: EdgeInsets.fromLTRB(24, 0, 24, 0),
+      margin: const EdgeInsets.fromLTRB(0, 40, 0, 24),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: list.length,

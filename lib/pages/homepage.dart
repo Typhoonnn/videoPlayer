@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'dart:convert';
+import 'package:videoplayer/model/home_page.dart';
+import 'package:videoplayer/http/http_util.dart';
+import 'package:videoplayer/http/http_options.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -61,14 +66,20 @@ class _MainContentState extends State<MainContent> {
   // fake data
   List imageList = [1, 2, 3, 4, 5];
   List videoList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  // List tabBarList = [];
 
-  @override
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   getData();
+  // }
+
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         // 横向分类bar
-        CatogeryList(),
+        const TabBarList(),
         // 轮播图
         ImageList(list: imageList),
         const Padding(
@@ -81,87 +92,105 @@ class _MainContentState extends State<MainContent> {
     );
   }
 }
-class CatogeryList extends StatefulWidget {
-  CatogeryList({Key? key}) : super(key: key);
+class TabBarList extends StatefulWidget {
+  const TabBarList({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  _CatogeryListState createState() => _CatogeryListState();
+  _TabBarListState createState() => _TabBarListState();
 }
 
-class _CatogeryListState extends State<CatogeryList> {
-  int _activeIndex = 0;
-  List categoryList = [];
-  
-  getData () {
-    // todo: getdata from backend
-    List list = [
-      {
-        "type_id": 1,
-        "type_name": "电影"
-      },
-      {
-        "type_id": 2,
-        "type_name": "动作片"
-      },
-      {
-        "type_id": 3,
-        "type_name": "电视剧"
-      },
-      {
-        "type_id": 4,
-        "type_name": "剧情片"
-      },
-      {
-        "type_id": 5,
-        "type_name": "综艺"
-      },
-      {
-        "type_id": 6,
-        "type_name": "体育"
-      },
-    ];
-    
-    setState(() {
-      categoryList = list;
-    });
-  }
+class _TabBarListState extends State<TabBarList> with TickerProviderStateMixin {
+  // int _activeIndex = 0;
+  List tabBarList = [];
+  late TabController _controller;
+  int _selectedIndex = 0;
   @override
   void initState() {
     super.initState();
-    getData();
+    _controller = TabController(length: tabBarList.length, vsync: this); 
+    _getData();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  // 初始化数据
+  void _getData() {
+    HttpUtil.request(HttpOptions.baseUrl, 'get').then((value) {
+      HomePageModel model = HomePageModel.fromJson(value);
+      setState(() {
+        // 分类列表
+        tabBarList = model.typeBarList;
+        _controller = TabController(length: tabBarList.length, vsync: this);
+      });
+    });
   }
   
+  @override
+  
   Widget build(BuildContext context) {
-    return Container(
-      height: 40,
-      padding: EdgeInsets.fromLTRB(24, 0, 24, 0),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: categoryList.length,
-        itemBuilder: (BuildContext context, int index) {
-          return GestureDetector(
-            child: Container(
-              width: 110,
-              alignment: Alignment.center,
-              child: Text(
-                  "${categoryList[index]["type_name"]}",
-                  style: TextStyle(color: _activeIndex == index ? Colors.black : Colors.white)
-                ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: _activeIndex == index ? Color.fromRGBO(0, 185, 231, 1) : Color.fromRGBO(0, 0, 0, 0)
+      // child: ListView.builder(
+      //   scrollDirection: Axis.horizontal,
+      //   itemCount: widget.tabBarList.length,
+      //   itemBuilder: (BuildContext context, int index) {
+      //     return GestureDetector(
+      //       child: Container(
+      //         width: 110,
+      //         alignment: Alignment.center,
+      //         child: Text(
+      //             "${widget.tabBarList[index].typeName}",
+      //             style: TextStyle(color: _activeIndex == index ? Colors.black : Colors.white)
+      //           ),
+      //         decoration: BoxDecoration(
+      //           borderRadius: BorderRadius.circular(20),
+      //           color: _activeIndex == index ? const Color.fromRGBO(0, 185, 231, 1) : const Color.fromRGBO(0, 0, 0, 0)
+      //         ),
+      //       ),
+      //       onTap: () {
+      //         setState(() {
+      //           _activeIndex = index;
+      //         });
+      //       },
+      //     );
+      //   },
+      // ),
+      return Expanded(
+        child: Column(children: [
+        Container(
+          height: 40,
+          // padding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(24, 0, 24, 0),
+            child: TabBar(
+              tabs: tabBarList.map((val) => Tab(text: val.typeName)).toList(),
+              isScrollable: true,
+              unselectedLabelColor: Colors.white,
+              labelStyle: const TextStyle(
+                color: Colors.black,
+                fontSize: 20,
               ),
+              indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(20), // Creates border
+                color: const Color.fromRGBO(0, 185, 231, 1)
+              ),
+              controller: _controller
             ),
-            onTap: () {
-              setState(() {
-                _activeIndex = index;
-              });
-            },
-          );
-          
-        },
-      ),
-    );
+          )
+        ),
+        Expanded(
+          child: TabBarView(
+            children: tabBarList.map((val) => Text(val.typeId.toString(), style: TextStyle(color: Colors.white),)).toList(),
+            controller: _controller
+          ),
+        )
+      ])
+      );
+      
   }
 }
 
